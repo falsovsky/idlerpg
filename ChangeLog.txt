@@ -1,0 +1,678 @@
+This is the changelog for the Idle RPG bot by jotun, jotun@idlerpg.net,
+http://idlerpg.net. Entries are written backwards. That is, items at the bottom
+of the file were added first, and each subsequent addition is placed on a line
+before it. Don't ask me why I do it that way: I do not know.
+
+Thanks for your interest in the Idle RPG! Feel free to contact me with ideas and
+comments, or post them in the forum on the website for public view.
+
+--------------------------------------------------------------------------------
+  v3.1.2+johm+chschu: released -/-/04
+--------------------------------------------------------------------------------
+  - setup !idle@IRCnet [johm]
+  - added ipv6 support [johm]
+  - added auto-login (after netsplit, ping timeout ...) if you haven't
+    changed your nick!user@host [johm]
+     * made auto-login optional [johm]
+  - fixed lvl60+ penalty bug [johm]
+  - fixed possible $rpreport timer bug [johm+chschu]
+  - team battles are now fought out around random points on the map [chschu]
+  - added wars of northern half against southern half of the map [chschu]
+     * made wars quadrant-based [chschu]
+  - dropped items stay on the map, lose 1 level every 30 minutes and are
+    found if somebody enters the same spot [chschu]
+     * changed downgrading time to 1 day, limited downgrading of uniques [chschu]
+     * only drop items of level > 0, downgrade uniques to non-uniques
+       below their minimum level [chschu]
+     * downgrading now depends on item level (higher => slower) [chschu]
+  - added reload of quest on startup [chschu]
+  - fixed bug with int() applied on non-numeric strings (item levels) [chschu]
+  - fixed config bug on empty value [chschu]
+  - fixed warning on undefined username in ha() [chschu]
+  - fixed bug breaking userhost on nick change [chschu]
+  - fixed voice on login bug (less nicks than flags) [chschu]
+
+
+--------------------------------------------------------------------------------
+  v3.1.2: released 6/6/04
+--------------------------------------------------------------------------------
+  - applied a user-submitted patch to fix a sprintf() bug (anonymous @ forum)
+  - quest() now calls writequestfile() when it completes
+  - loaddb() now calls backup() before it starts
+
+
+--------------------------------------------------------------------------------
+  v3.1.1: released 6/3/04
+--------------------------------------------------------------------------------
+  - fixed 2 typos having to deal with die() messages when reading the config
+    file (meij, et al)
+  - quest() now calls writequestfile() when it completes so that it is
+    immediately available
+  - loaddb() now calls backup() before it starts so you always have an
+    up-to-date backup if your bot mangles your db
+  - readconfig() now strips out \r and \n (meij, kylemson, et al)
+
+
+--------------------------------------------------------------------------------
+  v3.1.0: released 6/2/04
+--------------------------------------------------------------------------------
+  - added a config file so you don't have to re-setup configuration options
+    everytime you upgrade. added a function readconfig() to read this file or
+    die() if it cannot be found
+  - SIGHUP will now call readconfig()
+  - added a DELADMIN command to remove admin status from a username. format:
+        /msg bot DELADMIN <account>
+    owner account cannot be DELADMINed. DELADMIN may be limited to owner account
+    depending on configuration (TGS)
+  - added an 'owner' account option. owner cannot be DELADMINed, among other
+    things
+  - added an 'owneraddonly' option. if set, only owner account can MKADMIN
+  - added an 'ownerdelonly' option. if set, only owner account can DELADMIN
+  - renamed disablepeval to ownerpevalonly. if set, only owner account can PEVAL
+  - added missing command line options for %opts options
+  - fq() will limit itself to either 1 message or <= 768 bytes output per call,
+    regardless of $freemessages
+  - added an option to turn off the sending of the list of users automatically
+    logged back in on a bot restart, even if the list < 1 k
+  - added an option to limit the penalty a single event can incur, 'limitpen'.
+    set to 0 to disable the feature, otherwise is taken to be an integral number
+    of seconds
+  - Win32 no longer tries to turn terminal echo on/off via "stty"
+  - tarball now unpacks files to their own directory instead of .
+  - removed unused $v, $debug variables
+  - auto-login would not voice users that it logged in even if voiceonlogin was
+    set, fixed (wogi, et al)
+  - fixed a comment having to do with auto login
+  - $rpreport should not have been adjusted by $curtime, but by
+    $opts{self_clock} to keep it reliable. this may have caused some loss of
+    data as the bot neglected to properly backup its database. so sorry! should
+    now be fixed (many)
+  - item godsend was removing 10% of item's value instead of adding it. another
+    copy/paste error. sorry! (Jim Dew)
+  - fixed a bug that resulted in users that caused quests to fail not being
+    penalized, as they were set as 'offline' before the bot had a chance to
+    penalize them (Jim Dew)
+  - added options to define the size of your IRPG grid, 'mapx' and 'mapy' (Rick)
+  - team battle now shows roll/sum like other battles (anonymous @ forum)
+  - added REHASH command to call readconfig()
+  - added an option to define the number of modes per line to use when voicing
+    users after an auto login. this variable may be overriden by the server's
+    directive (Rick)
+
+
+--------------------------------------------------------------------------------
+  v3.0.2: released 5/30/04
+--------------------------------------------------------------------------------
+  - calls evilness() and goodness() should have been checking against the number
+    of online evil users and good users respectively, not the total number of
+    online users (SickMind)
+  - changed max length of auto-login text to 1k before bot will refuse to send
+  - fixed a problem with the bot penalizing the kicker instead of the kickee
+    when someone was kicked (Preston, anonymous, Soc @ idlerpg.net forum)
+
+
+--------------------------------------------------------------------------------
+  v3.0.1: released 5/29/04
+--------------------------------------------------------------------------------
+  - forgot to add some sort of mechanism for setting up admins for new bots.
+    whoops. bot will now prompt for an owner's account details if it cannot find
+    $opts{dbfile} (Secret, anonymous @ idlerpg.net forum)
+  - fixed a typo in the ChangeLog ;)
+  - Vayanla noted that there was STILL a time discrepancy for very large games
+    (or very slow computers). many thanks to him for his help! this is now
+    fixed
+
+--------------------------------------------------------------------------------
+  v3.0: released 5/29/04
+--------------------------------------------------------------------------------
+  - fixed a bug causing RESTART not to work unless the bot's filename happened
+    to be the same as its nickname
+  - item modifiers as well as time modifiers are now stored in the modifiers
+    file. changed name of tlog sub to clog (time -> character)
+  - changed database write to every minute instead of every $opts{self_clock}.
+    to lower the chance of lost stats, the bot calls writedb() if you request a
+    DIE, JUMP, or RESTART. this should cut down on much of the cpu usage
+  - added a function writedb() which writes out the bot's db from memory so it
+    can be done outside of rpcheck()
+  - the team battle code would choose 6 random users to participate in a team
+    battle, but would not then randomize these users as far as teams go. that
+    is, if a username generally appeared at the end of a keys(%rps) list, and
+    made it into the list of 6 random users, that user would always defend
+    instead of attacking, as he would be at the end of the list. the list of 6
+    users is now shuffled using a Fisher-Yates shuffle, code from The Perl
+    Cookbook (by O'Reilly. a really great read!) (Peter Beentje)
+  - added a "user alignment" feature. users may align with good, neutral, or
+    evil. 'good' users have a 10% boost to their item sum for battles, and a
+    1/12 chance each day that they, along with a 'good' friend, will have the
+    light of their god shine upon them, accelerating them 5-12% toward their
+    next level. 'evil' users have a 10% detriment to their item sum for battles
+    (ever forsaken in their time of most need...), but have a 1/8 chance each
+    day that they will either a) attempt to steal an item from a 'good' user
+    (whom they cannot help but hate) or b) be forsaken (for 1-5% of their TTL)
+    by their evil god. after all, we all know that crime doesn't pay. also,
+    'good' users have only a 1/50 chance of landing a critical strike when
+    battling, while 'evil' users (who always fight dirty) have a 1/20 chance.
+    neutral users haven't had anything changed, and all users start off as
+    neutral. to change your alignment:
+        /msg bot ALIGN <good|neutral|evil>
+    I haven't run the numbers to see which alignment it is better to follow, so
+    the stats for this feature may change in the future (FishyTowel @
+    idlerpg.net forum)
+  - added new item, Juliet's Glorious Ring of Sparkliness, item level 50-74,
+    required user level 25+, chance 1/40, tag 'h'
+  - rather than error when PEVAL produces > 15 lines of output, PEVAL will now
+    queue its text if lines of output created >= 4 or size of text > 1k
+  - LOGIN command now responds via notice rather than privmsg
+  - added "named items," meaning that unique items have a letter appended to
+    them, saying which unique item they are. Mattt's Omniscience Grand Crown is
+    "a," Res0's Protectorate Plate Mail is "b," Dwyn's Storm Magic Amulet is
+    "c," Jotun's Fury Colossal Sword is "d," Drdink's Cane of Blind Rage is "e,"
+    Mrquick's Magical Boots of Swiftness is "f," and Jeff's Cluehammer of Doom
+    is "g"
+  - changed split() on incoming data to split on /\s/ instead of / /; users
+    could otherwise register usernames or classes containing tabs, which would
+    cause the bot to die when reading the (tab-delimited) database (chris young)
+  - changed the SIGHUP handler from '0' to 'sub { };'. should eliminate the
+    "Signal handler '0' not defined" warning (too many to list)
+  - added an item calamity and an item godsend. if you are calamitized, you have
+    a 10% chance of one of your amulet, charm, weapon, tunic, set of leggings,
+    or shield losing 10% of its item value. if you are godsent, you have a 10%
+    chance that one of the above items will gain 10% of its item value (carl
+    wyles @ idlerpg.net forum)
+  - %botnick% in $opts{botopcmd} will be evaluated to the bot's current nickname
+    to avoid opping another, more evil user when the bot's nickname is in use
+  - added an option to give non-admin users limited access to the INFO command.
+    when enabled, non-admin users can use the INFO command to learn to which
+    server the bot is connected and the nicknames of online admins (mike @
+    idlerpg.net forum)
+  - added an option to disallow the registration of usernames and classes
+    containing "non-printable" characters. it's a good idea to leave this option
+    on, as I have had problems in the past with using binary hash keys (TGS)
+  - whenever a non-admin players walks over an admin player on the map, he/she
+    has a 1% chance to bow ;) (mike stewart)
+  - changed sending of WHO and $opts{botopcmd} from numeric 001 to receipt of
+    bot's JOIN
+  - added an option to disable the PEVAL command for users that want to have
+    less than trustworthy admins ;^) (TGS)
+  - Run noted that (undernet?) servers allow you a certain number of "free"
+    messages before output should be limited to 1 message / 2 seconds. fq() now
+    sends as many of these "free" messages as it can, rather than sending only
+    one message per call (Run)
+  - removed some odd sts("MODE $opts{botchan}"); -- not sure why i put that in
+  - added rudimentary netsplit detection, which a) gives no penalty and b) logs
+    users in upon return. will pick up quit messages that match
+    /^\S+\.\S+ \S+\.\S+$/. if your network (or server) does not prefix quit
+    messages with "Quit: " (or some other string), or otherwise disallows faked
+    netsplit quit messages, then users can cheat this at their whim. added
+    option to turn netsplit detection on or off. added option of how long to
+    wait before automatically logging split users out and forgetting they ever
+    existed. added sub checksplits() which will iterate over the list of split
+    nick!user@hosts, remove those which have expired ($opts{splitwait}), and log
+    the user out. would love input on this feature, as i expect bugs
+  - HELP command for non-admins is now less helpful. generates one line of text
+    containing URL for help
+  - attempting to PUSH a user more than their TTL now sets their TTL to 0 as
+    well as generating a notice to the admin. successful PUSH now only
+    chanmsg()s instead of chanmsg()ing and privmsg()ing the admin
+  - $arg[3] changed to lowercased, leading-:-stripped $arg[3] in privmsg block
+  - cleaned up more code. changed (most) elses elsifs where appropriate. cleaned
+    up some logic. dropped all uses of next(). attempted to add () to function
+    calls wherever it was missing
+  - private messages and notices to the bot no longer penalize you (mrChewie)
+  - changed ha() to find access by username instead of nickname
+  - added a finduser() sub to return a logged-in username matching a given
+    nickname.
+  - changed case of $arg[1] after PONG rather than lc()ing it for every
+    comparison (mrChewie)
+  - at least 15% of all online players must be level 45+ for the hourly battle
+    of a level 45+ player to occur (anonymous @ idlerpg.net forum)
+  - fixed a serious bug with the bot not tracking changes to its nick (ie, by
+    NickServ or PEVAL) -- this caused all messages sent to the bot to be
+    penalized (TGS)
+  - added $opts{casematters}, which, when set, will not allow the registration
+    of usernames that already exist in a different case (MeBeHere)
+  - changed db backup, top players report to every 10 hours
+  - added $opts{modsfile}, which is where Time Modifier texts are appended.
+    also, tlog() now debug()s and chanmsg()s an error message if it cannot open
+    the file (MeBeHere)
+  - HOG was only 5-74%, corrected to 5-75% of TTL
+  - added an option $opts{self_clock} which is rather like the old $alrmint var,
+    except this probably works without exploding if you change it. calamities,
+    godsends, etc. should take this number into account when calculating odds
+  - added a server list rather than static server. bot should try each server in
+    the server list twice before giving up (meij)
+  - added a PID filename option, to which the bot will write its PID (meij)
+  - added a few more cattle-themed calamities (anonymous @ idlerpg.net forum)
+  - added a trailing '!' to godsend() text instead of the drab old '.'
+  - added some new quests/calamities/godsends contributed by users. edited some
+    old calamities/quests/godsends. please feel free to post your ideas for more
+    to http://idlerpg.net/forum.php! (anonymous, Afbc0m, anjira, jv, mrChewie,
+    W8TVI, et al)
+  - attempted to scale occurences of HOGs, godsends, calamities, and team
+    battles. HOGs should occur about 1/user/20 days, calamities 1/user/8 days,
+    godsends 1/user/4 days, team battles 1/user/4 days. does this by calculating
+    the odds of a HOG as rand(20*86400/clock) < NUMBER_ONLINE_PLAYERS, odds of
+    calamities as rand(8*86400/clock) < NUMBER_ONLINE_PLAYERS, etc. this appears
+    to work great with at least 10 clients (tested up to 300), but doesn't seem
+    to work as well below that. would appreciate input
+  - debug information is now written to a file instead of STDOUT. bot now
+    daemonizes even though it is in debug mode. added sub debug() which takes an
+    argument of text to write to the debug file (yeoj)
+  - added new item, Jeff's Cluehammer of Doom, item level 300-350, required user
+    level 52+, chance 1/40
+  - bot will try to regain primary nickname if he sees it come open through a
+    /nick or /quit
+  - DELOLD command will removed non-logged-in accounts that have not been logged
+    into in more than N days. format is:
+        /msg bot DELOLD <N days>
+    DELOLD is a p0, admin command (DinTn)
+  - added option to enable a STATUS command. this p0 command gives information
+    on a user, such as level, class, time to level, item sum, etc. useful for
+    those IRPGs that lack a website. format is:
+        /msg bot STATUS [username]
+    if username argument is not passed, returns information on the user issuing
+    command. must be logged in to use STATUS (TGS)
+  - possibly added option to choose which local address/hostname and local port
+    to bind to. let me know if this does/doesn't work (DARKutz, Brad)
+  - added security note to head of file
+  - will not send auto-login user list if text > 2048 bytes
+  - added $opts{botmodes} which will set the bot's usermode to given string on
+    connect
+  - removed reset of last login time on auto-login; last login should be when
+    user last logged in, not when the bot logged them back in
+  - levels after level 60 have a next time to level of (time to level @ 60) +
+    (1 day) * (level - 60). levels below 60 have not changed. the exponential
+    code was getting a little too heavy by itself (TGS)
+  - RELOADDB would log all players out; fixed
+  - sts() & fq() check state of socket before attempting write. if cannot write,
+    outgoing queue is cleared
+  - added new item, Mrquick's Magical Boots of Swiftness, item level 250-300,
+    required user level 48+, chance 1/40
+  - debug messages are now timestamped. added a few extra debug messages, mostly
+    for fun
+  - top player report no longer occurs immediately after startup, but every 6
+    hours from then on
+  - added option to disallow registration of usernames/character classes
+    containing ctrl codes (Skill0)
+  - changed auto-login code from list to hash. would take several minutes to
+    synch to a channel with hundreds of users. now takes < 1s (Vayanla et al)
+  - removed the hard-coded "#G7" from the top players list.. whoops :^) that's
+    been there for some time now, can't believe no one ever noticed (HaRRo)
+  - added option to voice users on login/register. if you +m your channel, this
+    will cut down on spam, but won't allow non-logged-in or devoiced/deopped
+    clients to talk (pingh, wishes, aphade, et al)
+  - added a penalize() sub to make penalties a little cleaner
+  - added %quest hash to keep up with active quest info
+  - added option to write active quest info to file; this makes it readable by
+    outside programs
+  - can now specify multiple words for the advertisement ban, or turn feature
+    off entirely
+  - removed all alarm() code, should now run on any system supporting select(2)
+    (including, but not limited to, Win32). should also fix a nasty, terrible
+    time drift bug; with the amount of processing done in rpcheck(), the next
+    alarm() would come later than expected, awarding the user with idling less
+    than he had actually idled. it's a small amount, but adds up to about 205
+    seconds difference in the clocks after ~9.25 hours (in my tests; will differ
+    from machine to machine). MANY thanks to this bug's reporter, Ville
+    Luolajan-Mikkola
+  - added CLEARQ command, will clear all items in outgoing message queue
+  - INFO shows outgoing queue status, registrations this period, and total users
+  - cleaned up options section a little bit, made a few other code clean-ups
+  - created this file, ChangeLog.txt. the bot's code was getting too long
+  - registrations are now limited to 1 / sec. this should keep floodbots from
+    registering hundreds of accounts
+  - removed ALERT command
+  - removed $opts{admin} array, there is now a field in the db to mark this.
+    there is also a MKADMIN command to set an account as having admin access.
+    syntax is:
+        /msg bot MKADMIN <username>
+    there is no way to remove an account's administrator privileges, save from
+    editing the database by hand (well, there is PEVAL). so, don't assign this
+    lightly. admins have full access to the account under which you run the bot
+  - die() call if could not write irpg.db is now a chanmsg() instead
+  - added an outgoing message queue. all messages are now output at 1 message /
+    second, unless a non-zero $skipq flag is passed to sts(). privmsg(),
+    notice(), and chanmsg() calls pass their $force flag as a $skipq flag.
+    PONGs pass a $skipq of 1 (LexCyber)
+  - fixed a rather huge bug that someone on slashnet noticed. registering
+    \001PING\001 (or any other ctcp) would send that CTCP to the channel, then
+    penalize any who responded. usernames may no longer include a \001
+  - godsends, calamities, and quests were all moved to one file,
+    $opts{eventsfile}. quests are prefixed with a Q1 or Q2, depending on their
+    type; calamities with a C; and godsends with a G. quests are also prefixed
+    by their required coordinates if the quest type is 2
+  - fixed a typo in the Dwyn's Storm text
+  - changed code indentation to four spaces. reworked a lot of code to fit <= 80
+    columns
+  - changed QUEST command and quest() output to be a little more grammar-
+    friendly
+  - item stealing! if you are level >= 20, and you win a battle against a
+    player, you have a slightly less than 2% chance of stealing an item from
+    them. the 2% comes from a) you have a 1/25 chance to attempt to steal an
+    item and b) you have a 50% chance that your item (type is random) is lower
+    than theirs. the reason it's 'slightly less than' 2% is because you cannot
+    both Critical Strike a user and steal an item, so it's (2 - (1/35))%. you
+    cannot steal an item of lower level than your current item (Afbc0m)
+  - fixed duration() to show 1 day without trailing 's'
+  - re-added report of TTL after battle and after critical strike
+  - quest() function now chanmsg()s an error if it cannot open the
+    $opts{eventsfile} file
+  - INFO command now uses privmsg() force flag
+  - added grid! thanks to Joakim @ orkut for this great idea. within the irpg
+    world are all of the players on a 500x500 "grid" or map. every second, your
+    character has an equal chance to step left, right, or neither, and an equal
+    chance to step up, down, or neither. if your character encounters another
+    player, you have a 1/(# of online players) chance to battle. also, some
+    quests require all characters to reach some point on the map. quest
+    penalties and awards have not changed
+  - added REMOVEME command for users. if you are logged in,
+       /msg bot REMOVEME
+    will delete your account. this is a p0 command :^)
+  - added NEWPASS command for users. if you are logged in,
+       /msg bot NEWPASS <new password>
+    will set a new password. this is a p0 command
+
+
+--------------------------------------------------------------------------------
+  v2.4.1: unreleased
+--------------------------------------------------------------------------------
+
+  - PEVAL will now error and refuse to send output > 15 lines. this is to avoid
+    my own errors
+
+
+--------------------------------------------------------------------------------
+  v2.4+fixes: released 2/20/04
+--------------------------------------------------------------------------------
+
+  - items are set to 0 on account creation; they were previous undefined
+  - bug with QUEST command fixed; would say no active quest even when a quest
+    was active
+
+
+--------------------------------------------------------------------------------
+  v2.4: released 10/13/03
+--------------------------------------------------------------------------------
+
+  - updated privmsg() function to avoid annoying substr()/uninitialized value
+    warnings
+  - few small bugs in battling bot fixed. a win against bot awards you with 20%
+    of your TTL removed. a loss to bot adds 10% of your TTL to your clock
+  - bot's item sum is now the highest item sum of all users + 1 (mumkin)
+  - fixed RESTART command to clear alarm() before trying to exec()
+  - WHOAMI displays class, TTL (Minhiriath)
+  - CALC command removed
+  - added notice() function which mirrors the operation of privmsg()
+  - SILENT command allows admin to switch bot between 4 modes of silence. in
+    mode 0, bot sends all privmsgs. in mode 1, only chanmsg() is disabled. in
+    mode 2, only privmsg()/notice() to non-channels is disabled. in mode 3,
+    privmsgs/notices to users and channels are disabled. silent mode is also
+    configurable as $opts{'silentmode'}, so you can setup a bot in any channel
+    without it interrupting the channel with its privmsgs (???)
+  - third parameter added to privmsg()/notice(); force flag ignores $silentmode
+  - hard-coded check for OKish URLs to bot's 'http:'-style banning now
+    configurable (sean)
+  - JUMP command no longer penalizes if required argument is left blank
+  - BACKUP admin command tells bot to copy $opts{'dbfile'} to
+    .dbbackup/$opts{'dbfile'}TIMESTAMP; added backup() function to handle this
+  - RELOADDB command allows admin to force bot to reload player database file,
+    rewriting all memory. RELOADDB can only be used while in pause mode
+  - PAUSE command allows admin to place bot into pause mode. in pause mode, bot
+    will update player stats, but will not write database. combined with
+    RELOADDB, very effective for updating all players stats through external
+    script without taking bot offline. new accounts cannot be registered
+    while in pause mode
+  - QUEST command (p0) tells the active quest, its participants, and its time
+    left to completion
+  - ban message for 'http:'-type bans now makes unban-time more clear
+  - things have been sped up a bit. random battles for users level 45+ now occur
+    every hour. random chance for HOG, Godsends, Calamities, and Team Battles
+    were increased by a factor of 5
+  - time between quests upped to 12 hours. level requirement for quests upped to
+    40+. in addition, must have been online for at least 10 hours to be selected
+    for quests. number of persons on quest lowered to 4. quest penalty is now a
+    p15 instead of 2% of your TTL. this makes more sense, as users who were very
+    close to leveling were penalized almost nothing (inkblot et al)
+  - fixed spelling of 'caffeinated' (sean)
+  - botchan variable now shows how to join channel with key (Dan)
+
+
+--------------------------------------------------------------------------------
+  v2.3.1: released 9/20/03
+--------------------------------------------------------------------------------
+
+  - fixed bug with item finding; bad logic sometimes resulted in user not
+    finding any item (thanks mumkin!)
+
+
+--------------------------------------------------------------------------------
+  v2.3: released 8/29/03
+--------------------------------------------------------------------------------
+
+  - Jotun's Fury max level dropped back to 174
+  - added the Drdink's Cane of Blind Rage with item level 175-200
+  - all time modifiers (battles, HoG, etc) are now written to modifiers.txt
+  - function tlog() logs a string to modifiers.txt and returns the string
+  - changed WHOAMI to not use $_
+  - fixed another bug where changing your nick would prevent you from being a
+    candidate for auto-login
+  - LOGOUT command added as a p20
+  - you may now only be logged in under one character at a time. this will help
+    protect the bot from being flooded when a single user signs on under 10
+    accounts, then is penalized and warned 10 times. attempts to login under two
+    names are not penalized
+  - fixed a bug where all of your accounts were automatically logged on so long
+    as they shared the same host as you, regardless of whether they were online
+    before (on bot restart)
+  - there is a 1/20,000 chance of a calamity occuring every 5 seconds. the
+    calamity() function chooses a random user, then smites them with bad luck.
+    the penalty for a calamity is a random 5-12% of next TTL. users are only
+    chosen from the pool of online players
+  - there is a 1/10,000 chance of a godsend occuring every 5 seconds. the
+    godsend() function chooses a random user, then betters their luck. the
+    award for a godsend is a random 5-12% of next TTL. users are only chosen
+    from the pool of online players
+  - there are now 'quests' -- six level 30+ users are chosen to go on a quest
+    at a time. if all six users make it to the quest's end, all questers are
+    awarded by removing 25% of their TTL (ie, their TTL at quest's end). to
+    complete a quest, no user can be penalized until the quest's end. quests
+    last a random time between 12 and 24 hours. if the quest is not completed,
+    ALL online users are penalized 2% of their time as punishment. users are
+    only chosen from the pool of online players (original idea from Nerje; quest
+    ideas from Tristan, brt)
+  - quests are read from file 'quests.txt' every time quest() is called. this
+    allows you to add or remove quests while the bot is still running. quests
+    are not picked in order, but chosen at random from the file
+  - fixed bug in PUSH, allowing to push into negative TTL
+  - db times changed to ctime format in lieu of scalar localtime() (now
+    sortable)
+  - added db fields for total time idled; total times penalized for privmsg,
+    nick change, part, kick, LOGOUT, quest, and quit; and time account created
+  - REGISTER no longer penalizes if you are already logged in and the command
+    fails
+  - fixed 'http:' checking to only look at message text, not entire string
+  - messages passed through privmsg() are split into 450-byte chunks and then
+    passed to their target
+  - bans put into place by the 'http:' method are now removed after 1 hour to
+    prevent filling the banlist. bans are stored in @bans, which will hold at
+    most 12 bans to prevent the bot from flooding on unban. after 12, bans are
+    still set, but not stored
+  - 'license' in header slightly changed
+  - battle results now include item sums and the random number rolled for each
+    player. format is [roll/sum]
+  - bot will try to regain his nickname every 30 mins if it is in use at
+    sign-on. added vars $primnick and $opts{'botghostcmd'}. $primnick is set
+    to $opts{'botnick'} (which may change) on load, and $opts{'botghostcmd'}
+    is a nickserv ghost command string
+  - the bot's nick ($opts{'botnick'} and $primnick) cannot be registered as
+    character names
+  - bot is now a fightable player. his item sum is random 250-650. (someone;
+    mail me if this was your idea). chances of fighting him are equal to
+    fighting any other player
+  - bot now daemonizes when starting (jwbozzy)
+  - fixed duration code to use the correct secs/day (drdink/inkblot)
+  - added a penalty to Team Battle. players will now receive or lose 20% of the
+    lowest team member's TTL (drdink)
+  - changed battling to award tie to challenger, not challengee. random number
+    is also, now, an integer, not a float
+  - every 3.5 hours, a level 45+, online player will battle; this will make it
+    easier for high-level users to level
+  - added function itemsum() to return item sum for supplied username
+  - battle results written to battles.txt are now timestamped (Juliet)
+
+
+--------------------------------------------------------------------------------
+  v2.2.2 (schmolli): released 7/18/03
+--------------------------------------------------------------------------------
+
+  * The changes in this version are based almost completely on a patch sent to
+    me by Ed Schmollinger, schmolli@IRC. Many thanks to him for his help! Here
+    are his changes:
+  - SECURITY: added subroutine mksalt to generate random salt for passwds
+  - CLEANUP: added subroutines chanmsg and privmsg to send messages to
+    bot's channel and to a specified user, respectively
+  - FEATURE: added command line argument processing and removed TEST_MODE
+    (TEST_MODE is no longer necessary.)  Part of this includes moving most
+    of the variables into %opts.
+  - FIX: added check for number of existing players when printing top 3
+  - CLEANUP: changed "in:" and "out:" debug message to "<-" and "->"
+  - CLEANUP: indented concatenated lines
+
+
+--------------------------------------------------------------------------------
+  v2.2.1: released 7/16/03
+--------------------------------------------------------------------------------
+
+  - fixed a bug in item finding; if unique item was better than helm, not
+    better than its class, you would get the item (emad)
+
+
+--------------------------------------------------------------------------------
+  v2.2
+--------------------------------------------------------------------------------
+
+  - added 1/20000 chance of 'team battle' every 5 seconds. team battle is 3
+    players versus 3 other players. if the first three players win, their time
+    is lowered by 20% of the lowest of the three's TTL. if they lose, no time is
+    removed from any players. there is no chance for critical strike in a team
+    battle (Asterax)
+  - max level of Jotun's Fury Colossal Sword changed to 175
+  - fixed 'kick' bug; users that were kicked were not logged out
+  - kick added as a p250
+  - bot now only bans those non-logged in users that say 'http:' that've been in
+    the channel < 90 seconds
+  - bot won't ban for #G7-type URLs
+  - bot now shows nick of user when new account is registered
+  - forgot to close filehandle in loaddb(); fixed
+  - added a db backup every 6 hours
+
+
+--------------------------------------------------------------------------------
+  v2.1.3
+--------------------------------------------------------------------------------
+
+  - fixed bug where users changing their nick would not be candidates for
+    auto-login on a bot restart
+  - changed some messages to make them more friendly to female players (LapCat)
+
+
+--------------------------------------------------------------------------------
+  v2.1.2
+--------------------------------------------------------------------------------
+
+  - HoG can now carry or displace a player 5 - 75% toward the next level
+  - fixed CTCP version bug
+  - battling was changed from all users within 7 levels of you to all online
+    users
+  - added "unique" items, or a chance starting at level 25 to roll
+    higher-than-normal items
+
+
+--------------------------------------------------------------------------------
+  v2.1.1
+--------------------------------------------------------------------------------
+
+  - DIE, JUMP, RESTART, INFO, and PEVAL now send warnings to users that don't
+    have access to tell them so. they are still penalized
+  - bot will now penalize users without the proper access that try to use an
+    admin command
+  - add commands CHCLASS, CHUSER, and PUSH to adjust class names, usernames,
+    and next time to level, respectively
+  - HoG could occur for offline users; this is no longer the case
+  - bot now responds to CTCP version requests (drdink)
+
+
+--------------------------------------------------------------------------------
+  v2.1
+--------------------------------------------------------------------------------
+
+  - bot bans non-logged-in users that say 'http:'
+  - INFO did not check ha(); fixed
+  - bot will automagically log you back in if you were logged in before a bot
+    restart, and if you haven't changed your nick!user@host since then
+  - removed logging
+  - dropped functions relating to old database in favor of the new one
+  - changed level up report from seconds to duration()
+  - changed item/userinfo db's to one file; battles still in battles.txt
+  - changed challenge report from seconds to duration()
+  - changed penalty text to display duration() instead of seconds
+  - added critical strike, 1/35 chance upon winning battle to cause opponent to
+    lose time (dwyn)
+  - changed summon text for HoG (res0)
+  - changed access to base off of irpg username in lieu of host
+  - changed top player report to every 6 hours
+  - changed positive HoG text (res0)
+  - changed random HoG chance to 1/20000 every 5 seconds
+
+
+--------------------------------------------------------------------------------
+  v2.0.3
+--------------------------------------------------------------------------------
+
+  - dropped top players back to 3
+  - removed STATUS; TTL available through website.
+  - battle history added to website; added logging of battles to battles.txt
+  - peval did not next(); fixed.
+  - added HOG command, randomly chooses someone, then randomly raises/lowers
+    their TTL (20% raise, 80% lower). HOG is, of course, an abbreviation for
+    Hand of God
+  - added a 1/7500 random HoG into rpcheck()
+
+
+--------------------------------------------------------------------------------
+  v2.0.2
+--------------------------------------------------------------------------------
+
+  - STATUS would log you out; fixed.
+  - could STATUS if not online; fixed.
+  - added DEL command to remove accounts
+  - added ALERT command to make channel alerts
+  - changed admin HELP command text to display website
+
+
+--------------------------------------------------------------------------------
+  v2.0.1
+--------------------------------------------------------------------------------
+
+  - fixed self-battle bug
+  - changed chance to battle from 20% to 25% if level < 25, 100% if >= 25
+  - setup companion website
+  - updated HELP command to reflect website
+  - changed battle gain to (max(7,opplevel/4)/100)*your_next_ttl
+  - added battle loss of (max(7,opplevel/7)/100)*your_next_ttl
+
+
+--------------------------------------------------------------------------------
+  v2.0
+--------------------------------------------------------------------------------
+
+  - added item finding and battling
+  - added penalties for QUIT, PART, instead of resetting time to the beginning
+    of that level
+
+
+--------------------------------------------------------------------------------
+  v1.0
+--------------------------------------------------------------------------------
+
+  - initial version

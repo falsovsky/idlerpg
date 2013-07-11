@@ -1,0 +1,469 @@
+# IRPG db conversion tool; converts db version 2.4 -> 3.0
+# Jon Honeycutt, jotun@idlerpg.net, http://idlerpg.net
+# Free for all use, public and private, with retention of copyright notice.
+
+use strict;
+use IO::Socket;
+
+my %rps = ();
+my $temp;
+
+$|=1;
+
+print "\nIRPG db conversion tool; version 2.4 -> 3.0\n\n";
+
+do {
+    print "Read from file [irpg.db]: ";
+    chomp($temp=<STDIN>);
+    $temp ||= "irpg.db";
+    if (! -e $temp) { print "Error: No such file\n"; }
+} until (-e $temp);
+
+loaddb($temp);
+
+print "Loaded ".scalar(keys(%rps))." accounts from $temp.\n";
+
+do {
+    print "\nBackup old irpg.db file? [yes]: ";
+    chomp($temp=<STDIN>);
+    $temp||="yes";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    do {
+        print "\nBackup filename [irpg.db.old]: ";
+        chomp($temp=<STDIN>);
+        $temp||="irpg.db.old";
+    } until (defined($temp));
+    open(RPS,">$temp") or die("Cannot write $temp: $!");
+    print RPS "# username\tpass\tlevel\tclass\tnext\tnick\tuserhost\tonline\t".
+              "idled\tpen_mesg\tpen_nick\tpen_part\tpen_kick\tpen_quit\t".
+              "pen_quest\tpen_logout\tcreated\tlast login\tamulet\tcharm\t".
+              "helm\tboots\tgloves\tring\tleggings\tshield\ttunic\tweapon\n";
+    for my $k (keys %rps) {
+        print RPS join("\t",
+          $k,
+          $rps{$k}{pass},
+          $rps{$k}{level},
+          $rps{$k}{class},
+          $rps{$k}{next},
+          $rps{$k}{nick}||"",
+          $rps{$k}{userhost}||"",
+          $rps{$k}{online}||0,
+          $rps{$k}{idled}||0,
+          $rps{$k}{pen_mesg}||0,
+          $rps{$k}{pen_nick}||0,
+          $rps{$k}{pen_part}||0,
+          $rps{$k}{pen_kick}||0,
+          $rps{$k}{pen_quit}||0,
+          $rps{$k}{pen_quest}||0,
+          $rps{$k}{pen_logout}||0,
+          $rps{$k}{created},
+          $rps{$k}{lastlogin},
+          $rps{$k}{item}{amulet}||0,
+          $rps{$k}{item}{charm}||0,
+          $rps{$k}{item}{helm}||0,
+          $rps{$k}{item}{"pair of boots"}||0,
+          $rps{$k}{item}{"pair of gloves"}||0,
+          $rps{$k}{item}{ring}||0,
+          $rps{$k}{item}{"set of leggings"}||0,
+          $rps{$k}{item}{shield}||0,
+          $rps{$k}{item}{tunic}||0,
+          $rps{$k}{item}{weapon}||0)."\n";
+    }
+    close(RPS);
+    print "Wrote $temp.\n";
+}
+
+do {
+    print "\nReset all user levels to 0, all times to level to 0, all items ".
+          "to 0, all penalties to 0, all online flags to 0, all idled times ".
+          "to 0, all creation dates and last login times to today (i.e., ".
+          "reset game)? [no]: ";
+    chomp($temp=<STDIN>);
+    $temp||="no";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    for my $k (keys(%rps)) {
+        $rps{$k}{next}=0;
+        $rps{$k}{level}=0;
+        $rps{$k}{online}=0;
+        $rps{$k}{idled}=0;
+        $rps{$k}{item}{amulet}=0;
+        $rps{$k}{item}{charm}=0;
+        $rps{$k}{item}{helm}=0;
+        $rps{$k}{item}{"pair of boots"}=0;
+        $rps{$k}{item}{"pair of gloves"}=0;
+        $rps{$k}{item}{ring}=0;
+        $rps{$k}{item}{"set of leggings"}=0;
+        $rps{$k}{item}{shield}=0;
+        $rps{$k}{item}{tunic}=0;
+        $rps{$k}{item}{weapon}=0;
+        $rps{$k}{pen_mesg}=0;
+        $rps{$k}{pen_nick}=0;
+        $rps{$k}{pen_part}=0;
+        $rps{$k}{pen_kick}=0;
+        $rps{$k}{pen_quit}=0;
+        $rps{$k}{pen_quest}=0;
+        $rps{$k}{pen_logout}=0;
+        $rps{$k}{created}=time();
+        $rps{$k}{lastlogin}=time();
+    }
+    print "Game reset.\n";
+}
+
+do {
+    print "\nStrip all control codes from character names and classes? [no]: ";
+    chomp($temp=<STDIN>);
+    $temp ||="no";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    my(@usernames,@classes);
+    for my $k (keys(%rps)) {
+        if ($k =~ /[[:cntrl:]]/) {
+            my $newusername = $k;
+            $newusername =~ s/[[:cntrl:]]//g;
+            if (exists($rps{$newusername}) || !defined($newusername) ||
+                !length($newusername)) {
+                print "\nError: While trying to strip control codes from $k, ".
+                      "found stripped version ($newusername) already exists ".
+                      "in database or is undefined. Skipping this user, so ".
+                      "sorry.\n";
+            }
+            else {
+                $rps{$newusername}=delete($rps{$k});
+                push(@usernames,"$k is now: $newusername");
+                $k = $newusername;
+            }
+        }
+        if ($rps{$k}{class} =~ /[[:cntrl:]]/) {
+            $rps{$k}{class} =~ s/[[:cntrl:]]//g;
+            push(@classes,"$k is now: $rps{$k}{class}");
+        }
+    }
+    if (@usernames) {
+        print "\nUsernames changed (would be good to alert these users):\n";
+        print "User $_\n" for @usernames;
+        print "\n";
+    }
+    if (@classes) {
+        print "\nClass names changed (might be good to alert these users):\n";
+        print "User $_\n" for @classes;
+        print "\n";
+    }
+}
+
+do {
+    print "\nStrip all non-printable characters from character names and ".
+          "classes? [no]: ";
+    chomp($temp=<STDIN>);
+    $temp ||="no";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    my(@usernames,@classes);
+    for my $k (keys(%rps)) {
+        if ($k =~ /[[:^print:]]/) {
+            my $newusername = $k;
+            $newusername =~ s/[[:^print:]]//g;
+            if (exists($rps{$newusername}) || !defined($newusername) ||
+                !length($newusername)) {
+                print "\nError: While trying to strip non-printable chars ".
+                      "from $k, found stripped version ($newusername) already ".
+                      "exists in database or is undefined. Skipping this ".
+                      "user, so sorry.\n";
+            }
+            else {
+                $rps{$newusername}=delete($rps{$k});
+                push(@usernames,"$k is now: $newusername");
+                $k = $newusername;
+            }
+        }
+        if ($rps{$k}{class} =~ /[[:^print:]]/) {
+            $rps{$k}{class} =~ s/[[:^print:]]//g;
+            push(@classes,"$k\'s class is now: $rps{$k}{class}");
+        }
+    }
+    if (@usernames) {
+        print "\nUsernames changed (would be good to alert these users):\n";
+        print "User $_\n" for @usernames;
+        print "\n";
+    }
+    if (@classes) {
+        print "\nClass names changed (might be good to alert these users):\n";
+        print "User $_\n" for @classes;
+        print "\n";
+    }
+}
+
+do {
+    print "\nVersion 3.0 supports 'named items,' or a method of marking ".
+          "unique items as being unique. Attempt to name existing items that ".
+          "are known uniques? [yes]: ";
+    chomp($temp=<STDIN>);
+    $temp ||="yes";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    for my $k (keys(%rps)) {
+        for my $item (keys(%{$rps{$k}{item}})) {
+            if ($rps{$k}{item}{$item} > int(1.5*$rps{$k}{level})) {
+                if ($item eq "helm") {
+                    print "$k\'s $item named as Mattt's Omniscience.\n";
+                    $rps{$k}{item}{$item} .= "a";
+                }
+                elsif ($item eq "tunic") {
+                    print "$k\'s $item named as Res0's Protectorate.\n";
+                    $rps{$k}{item}{$item} .= "b";
+                }
+                elsif ($item eq "amulet") {
+                    print "$k\'s $item named as Dwyn's Storm.\n";
+                    $rps{$k}{item}{$item} .= "c";
+                }
+                elsif ($item eq "weapon" && $rps{$k}{item}{$item} < 175) {
+                    print "$k\'s $item named as Jotun's Fury.\n";
+                    $rps{$k}{item}{$item} .= "d";
+                }
+                elsif ($item eq "weapon" && $rps{$k}{item}{$item} > 175 &&
+                       $rps{$k}{item}{$item} < 201) {
+                    print "$k\'s $item named as Drdink's Cane of Blind Rage.\n";
+                    $rps{$k}{item}{$item} .= "e";
+                }
+                else {
+                    print "$k has unknown unique of level ".
+                          "$rps{$k}{item}{$item}.\n";
+                }
+            }
+        }
+    }
+}
+
+do {
+    print "\nThere exist new items in version 3.0 that some of your clients ".
+          "may already have had the chance to find. I.E., there is a new item ".
+          "with a required level of 48. Simulate an item find for all users ".
+          "above 48 for this and other new items to make the game fair for ".
+          "older users? [yes]: ";
+    chomp($temp=<STDIN>);
+    $temp ||="yes";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    for my $k (keys(%rps)) {
+        if ($rps{$k}{level} >= 48) {
+            for (48..$rps{$k}{level}) {
+                # approximately equal to normal item find, i believe
+                if (rand(100) < 2.25) {
+                    my $ulevel = 250+int(rand(51));
+                    if ($ulevel > int($rps{$k}{item}{"pair of boots"})) {
+                        print "$k found level $ulevel Mrquick's Magical Boots ".
+                              "of Swiftness.\n";
+                        $rps{$k}{item}{"pair of boots"} = $ulevel."f";
+                    }
+                }
+            }
+        }
+        if ($rps{$k}{level} >= 52) {
+            for (52..$rps{$k}{level}) {
+                # approximately equal to normal item find, i believe
+                if (rand(100) < 2.15) {
+                    my $ulevel = 300+int(rand(51));
+                    if ($ulevel > int($rps{$k}{item}{weapon})) {
+                        print "$k found level $ulevel Jeff's Cluehammer of ".
+                              "Doom.\n";
+                        $rps{$k}{item}{weapon} = $ulevel."g";
+                    }
+                }
+            }
+        }
+        if ($rps{$k}{level} >= 25) {
+            for (25..$rps{$k}{level}) {
+                # approximately equal to normal item find, i believe
+                if (rand(100) < 2.43) {
+                    my $ulevel = 50+int(rand(25));
+                    if ($ulevel > int($rps{$k}{item}{ring})) {
+                        print "$k found level $ulevel Juliet's Glorious Ring ".
+                              "of Sparkliness.\n";
+                        $rps{$k}{item}{ring} = $ulevel."h";
+                    }
+                }
+            }
+        }
+    }
+}
+
+for my $k (keys(%rps)) {
+    $rps{$k}{x} = int(rand(500));
+    $rps{$k}{y} = int(rand(500));
+    $rps{$k}{isadmin}=0;
+    $rps{$k}{alignment}="n";
+}
+
+print "\nUsernames that you would like to have admin status (separate with ".
+      "commas, use proper CaSe): ";
+chomp($temp=<STDIN>);
+$temp =~ s/\s//g;
+for my $k (split(/,/,$temp)) {
+    if (!exists($rps{$k})) {
+        print "\nError: Account name '$k' does not exist. Remember that ".
+              "account names are case sensitive. Skipping this username. Edit ".
+              "the database manually, or use the MKADMIN command after the ".
+              "bot connects to add this user.\n\n";
+    }
+    else {
+        print "$k is now admin.\n";
+        $rps{$k}{isadmin}=1;
+    }
+}
+print "\nYou can add more admins later with the MKADMIN command.\n";
+
+do {
+    print "\nWrite to new db file [irpg.db]: ";
+    chomp($temp=<STDIN>);
+    $temp ||= "irpg.db";
+} until (defined($temp));
+
+open(RPS,">$temp") or die "Cannot open $temp: $!";
+
+print RPS join("\t","# username",
+    "pass",
+    "is admin",
+    "level",
+    "class",
+    "next ttl",
+    "nick",
+    "userhost",
+    "online",
+    "idled",
+    "x pos",
+    "y pos",
+    "pen_mesg",
+    "pen_nick",
+    "pen_part",
+    "pen_kick",
+    "pen_quit",
+    "pen_quest",
+    "pen_logout",
+    "created",
+    "last login",
+    "amulet",
+    "charm",
+    "helm",
+    "boots",
+    "gloves",
+    "ring",
+    "leggings",
+    "shield",
+    "tunic",
+    "weapon",
+    "alignment")."\n";
+
+for my $k (keys(%rps)) {
+    print RPS join("\t",
+        $k,
+        $rps{$k}{pass},
+        $rps{$k}{isadmin},
+        $rps{$k}{level},
+        $rps{$k}{class},
+        $rps{$k}{next},
+        $rps{$k}{nick},
+        $rps{$k}{userhost},
+        $rps{$k}{online},
+        $rps{$k}{idled},
+        $rps{$k}{x},
+        $rps{$k}{y},
+        $rps{$k}{pen_mesg},
+        $rps{$k}{pen_nick},
+        $rps{$k}{pen_part},
+        $rps{$k}{pen_kick},
+        $rps{$k}{pen_quit},
+        $rps{$k}{pen_quest},
+        $rps{$k}{pen_logout},
+        $rps{$k}{created},
+        $rps{$k}{lastlogin},
+        $rps{$k}{item}{amulet},
+        $rps{$k}{item}{charm},
+        $rps{$k}{item}{helm},
+        $rps{$k}{item}{"pair of boots"},
+        $rps{$k}{item}{"pair of gloves"},
+        $rps{$k}{item}{ring},
+        $rps{$k}{item}{"set of leggings"},
+        $rps{$k}{item}{shield},
+        $rps{$k}{item}{tunic},
+        $rps{$k}{item}{weapon},
+        $rps{$k}{alignment})."\n";
+}
+close(RPS);
+
+do {
+    print "\nDone writing $temp! Thanks for your interest in the Idle RPG. May ".
+          "I send an (anonymous) user count to idlerpg.net? jotun is ".
+          "interested in knowing how many people play his game :^) [yes]: ";
+    chomp($temp=<STDIN>);
+    $temp||="yes";
+    $temp=lc($temp);
+} until ($temp eq "yes" || $temp eq "no");
+
+if ($temp eq "yes") {
+    print "Sending...\n";
+    my $sock = IO::Socket::INET->new(PeerAddr=>"jotun.ultrazone.org:80");
+    if ($sock) {
+        print $sock "GET /g7/count.php?converted=".scalar(keys(%rps)).
+                        " HTTP/1.1\r\n".
+                    "Host: jotun.ultrazone.org:80\r\n\r\n";
+        1 while <$sock>;
+    }
+    print "\nDone! Thanks a million! Enjoy Idle RPG. :^)\n";
+}
+else {
+    print "\nI'm setting your chance of evil HoG to 100%, then. Just kidding. ".
+          "Thanks anyway.\n";
+}
+
+sub loaddb { # load the players database
+  open(RPS,shift(@_)) or die("loaddb() failed: $!");
+  while (my $l=<RPS>) {
+    chomp $l;
+    next if $l =~ /^#/; # skip comments
+    my @i = split("\t",$l);
+    print Dumper @i if @i != 28;
+    die("Anomaly in loaddb(); line $. of database has wrong fields (".
+      scalar(@i).")") if @i != 28;
+    ($rps{$i[0]}{pass},
+    $rps{$i[0]}{level},
+    $rps{$i[0]}{class},
+    $rps{$i[0]}{next},
+    $rps{$i[0]}{nick},
+    $rps{$i[0]}{userhost},
+    $rps{$i[0]}{online},
+    $rps{$i[0]}{idled},
+    $rps{$i[0]}{pen_mesg},
+    $rps{$i[0]}{pen_nick},
+    $rps{$i[0]}{pen_part},
+    $rps{$i[0]}{pen_kick},
+    $rps{$i[0]}{pen_quit},
+    $rps{$i[0]}{pen_quest},
+    $rps{$i[0]}{pen_logout},
+    $rps{$i[0]}{created},
+    $rps{$i[0]}{lastlogin},
+    $rps{$i[0]}{item}{amulet},
+    $rps{$i[0]}{item}{charm},
+    $rps{$i[0]}{item}{helm},
+    $rps{$i[0]}{item}{"pair of boots"},
+    $rps{$i[0]}{item}{"pair of gloves"},
+    $rps{$i[0]}{item}{ring},
+    $rps{$i[0]}{item}{"set of leggings"},
+    $rps{$i[0]}{item}{shield},
+    $rps{$i[0]}{item}{tunic},
+    $rps{$i[0]}{item}{weapon}) = (@i[1..$#i]);
+  }
+  close RPS;
+}

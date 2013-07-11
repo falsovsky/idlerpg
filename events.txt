@@ -1,0 +1,71 @@
+C was bitten by drdink
+C fell into a hole
+C bit their tongue
+C set themself on fire
+C ate a poisonous fruit
+C lost their mind
+C died, temporarily..
+C was caught in a terrible snowstorm
+C EXPLODED, somewhat..
+C got knifed in a dark alley
+C saw an episode of Ally McBeal
+C got turned INSIDE OUT, practically
+C ate a very disagreeable fruit, getting a terrible case of heartburn
+C met up with a mob hitman for not paying his bills
+C has fallen ill with the black plague
+C was struck by lightning
+C was attacked by a rabid cow
+C was attacked by a rabid wolverine
+C was set on fire
+C was decapitated, temporarily..
+C was tipped by a cow
+C was bucked from a horse
+C was bitten by a møøse
+C was sat on by a giant
+C ate a plate of discounted, day-old sushi
+C got harassed by peer
+C got lost in the woods
+C misplaced his map
+C broke his compass
+C lost his glasses
+C walked face-first into a tree
+G found a pair of Nikes
+G caught a unicorn
+G discovered a secret, underground passage
+G was taught to run quickly by a secret tribe of pygmies that know how to, among other things, run quickly
+G discovered caffeinated coffee
+G grew an extra leg
+G was visited by a very pretty nymph
+G found kitten
+G learned Perl
+G found an exploit in the IRPG code
+G tamed a wild horse
+G found a one-time-use spell of quickness
+G bought a faster computer
+G bribed the local IRPG administrator
+G stopped using dial-up
+G invented the wheel
+G gained a sixth sense
+G got a kiss from drwiii
+G had his clothes laundered by a passing fairy
+G was rejuvenated by drinking from a magic stream
+G was bitten by a radioactive spider
+G hit it off with a drunk sorority chick named Jenny
+G was accepted into Pi Beta Phi
+Q2 225 415 280 460 lay waste to the Towers of Ankh-Allor, wherein lies the terrible sorceror Croocq
+Q1 locate the centuries-lost tomes of the grim prophet Haplashak Mhadhu
+Q2 400 475 480 380 explore and chart the dark lands of T'rnalvph
+Q1 locate the ancient writings of Ahmo, prophet of the blind god Io, namely his last and hidden work, Time as Deity, thought to answer all of mankind's greater wonders
+Q2 290 65 325 270 slay the great and horrible troll, Dokt'r Wiii
+Q2 480 415 325 270 return the stolen relics of Iao-Sabao to the city of Velvragh, quieting the religious riot that has sprung up from their loss
+Q2 70 315 325 270 guard the secret passage to Bharash until the full moon has passed, and the evil returned to its resting place
+Q2 50 350 325 270 destroy the bandits terrorizing the roads passing through the Great Shahlil mountains
+Q1 locate and destroy the immensely powerful Eyeless Amulet of the evil sorceress, Ankh B'loht
+Q2 167 458 325 270 rescue the beautiful princess Juliet from the grasp of the beast Grabthul
+Q1 locate the herbs and brew the elixir to rid the realm of the Normonic Plague
+Q2 160 480 160 380 hunt down the over-abundance of mountain wolves that are slaying the regions' cows
+Q2 35 40 325 270 assassinate the general, Ronald Ashur, of the invading army of Denmark
+Q2 235 125 430 60 setup a trade route through the mountains to the neighboring land of Qwok and arrange correspondence with their leader, Cuincey-Love Vikk'l
+Q2 155 155 325 270 live among and learn the ancient magick of the tribe of pygmie people, the Jow Botzi
+Q2 70 125 170 100 kill the resurrected Jow Botzian zombies produced by a young wizard's wayward spell
+Q1 worship the sacred Cow until such time as she is satiated
