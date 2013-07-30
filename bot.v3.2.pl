@@ -1041,18 +1041,93 @@ sub parse {
                     }
                 }
             }
-	    elsif ($arg[3] eq "irc") {
-                if (!ha($username)) {
-                    privmsg("You do not have access loser.", $usernick);
+
+            #
+            # normal users
+            # teleport <x> <y>
+            #
+            elsif ($arg[3] eq "teleport") {
+                if ($#arg < 5 || $arg[5] eq "" || (($arg[4] !~ /^\d+$/) && ($arg[5] !~ /^\d+$/))) {
+                    privmsg("Try: TELEPORT <x> <y>", $usernick, 1);
+                } else {
+                    privmsg("You are not eligible to use TELEPORT.", $usernick, 1, 1);
                 }
-                else {
-		    privmsg("Okay.", $usernick);
-               	    sts("@arg[4..$#arg]",1);
-		}
             }
 
+            #
+            # normal users
+            # fight <Player>
+            #
+            elsif ($arg[3] eq "fight") {
+                if ($#arg < 4 || $arg[4] eq "") {
+                    privmsg("Try: FIGHT <Player>", $usernick, 1);
+                } elsif (!exists($rps{$arg[4]})) {
+                    privmsg("No such username $arg[4].", $usernick, 1, 1);
+                } else {
+                    privmsg("You are not eligible to use FIGHT.", $usernick, 1);
+                }
+            }
+
+            #
+            # admin only
+            # irc <irc raw command>
+            #
+            elsif ($arg[3] eq "irc") {
+                if (!ha($username)) {
+                   privmsg("You do not have access loser.", $usernick, 1);
+                } else {
+                   privmsg("Okay.", $usernick, 1);
+                   sts("@arg[4..$#arg]",1);
+                }
+            }
+
+            #
+            # admin only
+            # move <Player> <x> <y>
+            #
+            elsif ($arg[3] eq "move") {
+                if (!ha($username)) {
+                   privmsg("You do not have access loser.", $usernick, 1);
+                } else {
+                    if ($#arg < 6 || $arg[6] eq "" || (($arg[5] !~ /^\d+$/) && ($arg[6] !~ /^\d+$/))) {
+                        privmsg("Try: MOVE <Player> <x> <y>", $usernick, 1);
+                    } elsif (!exists($rps{$arg[4]})) {
+                       privmsg("No such username $arg[4].", $usernick, 1, 1);
+                    } else {
+                        my $old_x = $rps{$arg[4]}{x};
+                        my $old_y = $rps{$arg[4]}{y};
+                        $rps{$arg[4]}{x} = $arg[5];
+                        $rps{$arg[4]}{y} = $arg[6];
+                        privmsg("Moved $arg[4] from $old_x,$old_y to $rps{$arg[4]}{x},$rps{$arg[4]}{y}.", $usernick, 1, 1);
+                    }
+                }
+            }
+
+            #
+            # admin only
+            # pit <Player 1> <Player 2>
+            #
+            elsif ($arg[3] eq "pit") {
+                if (!ha($username)) {
+                   privmsg("You do not have access loser.", $usernick, 1);
+                } else {
+                    if ($#arg < 5 || $arg[5] eq "") {
+                        privmsg("Try: PIT <Player 1> <Player 2>", $usernick, 1);
+                    } elsif (!exists($rps{$arg[4]})) {
+                        privmsg("No such username $arg[4].", $usernick, 1, 1);
+                    } elsif (!exists($rps{$arg[5]})) {
+                        privmsg("No such username $arg[5].", $usernick, 1, 1);
+                    } else {
+                       collision_fight($arg[4], $arg[5]);
+                       privmsg("Pit $arg[4] against $arg[5].", $usernick, 1);
+                    }
+                }
+            }
+
+
+
         }
-        
+
         # penalize returns true if user was online and successfully penalized.
         # if the user is not logged in, then penalize() fails. so, if user is
         # offline, and they say something including "http:", and they've been on
