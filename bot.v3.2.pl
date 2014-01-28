@@ -228,7 +228,7 @@ CONNECT: # cheese.
 
 loaddb();
 
-while (!$sock && $conn_tries < 2*@{$opts{servers}}) {
+while (!$sock && $conn_tries < 100000*@{$opts{servers}}) {
     debug("Connecting to $opts{servers}->[0]...");
     my %sockinfo = (PeerAddr => $opts{servers}->[0]);
     if ($opts{localaddr}) { $sockinfo{LocalAddr} = $opts{localaddr}; }
@@ -1083,6 +1083,27 @@ sub parse {
 
             #
             # admin only
+            # topic
+            #
+            elsif ($arg[3] eq "topic") {
+                if (!ha($username)) {
+                   privmsg("You do not have access loser.", $usernick, 1);
+                } else {
+                   privmsg("Okay.", $usernick, 1);
+                   my @u = sort { $rps{$b}{level} <=> $rps{$a}{level} ||
+                      $rps{$a}{next}  <=> $rps{$b}{next} } keys(%rps);
+
+                   my $top = "";
+                   for my $i (0..2) {
+                       $#u >= $i and
+                       $top .= "#".($i+1).": $u[$i], lv. $rps{$u[$i]}{level} $rps{$u[$i]}{class}; ";
+                   }
+                   sts("TOPIC $opts{botchan} :@arg[4..$#arg] $top", 1);
+                }
+            }
+
+            #
+            # admin only
             # move <Player> <x> <y>
             #
             elsif ($arg[3] eq "move") {
@@ -1307,8 +1328,8 @@ sub rpcheck { # check levels, update database
     if ($rpreport && ($rpreport%36000 < $oldrpreport%36000)) { # 10 hours
         my @u = sort { $rps{$b}{level} <=> $rps{$a}{level} ||
                        $rps{$a}{next}  <=> $rps{$b}{next} } keys(%rps);
-        chanmsg("Idle RPG Top Players:") if @u;
-        for my $i (0..2) {
+        chanmsg("IdleRPG Top Players:") if @u;
+        for my $i (0..4) {
             $#u >= $i and
             chanmsg("$u[$i], the level $rps{$u[$i]}{level} ".
                     "$rps{$u[$i]}{class}, is #" . ($i + 1) . "! Next level in ".
@@ -2225,7 +2246,9 @@ sub godsend { # bless the unworthy
                 ".");
     }
 }
-
+#
+# initializes the quest
+#
 sub quest {
     @{$quest{questers}} = grep { $rps{$_}{online} && $rps{$_}{level} > 39 &&
                                  time()-$rps{$_}{lastlogin}>36000 } keys(%rps);
