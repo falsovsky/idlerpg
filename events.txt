@@ -31,6 +31,11 @@ C broke his compass
 C lost his glasses
 C developed ADD
 C walked face-first into a tree
+C has come across the Ghost of Gamito, he forced you to start usign qmail
+C started a discussion about football in #C
+C started a discussion about BIG DATA in #C
+C started using a MacBook Pro
+C tried and failed to install gentoo
 G found a pair of Nikes
 G caught a unicorn
 G discovered a secret, underground passage
@@ -48,6 +53,7 @@ G bribed the local IRPG administrator
 G stopped using dial-up
 G invented the wheel
 G smoked a bowl of fine weed
+G became an IRC Op
 G gained a sixth sense
 G got a kiss from drwiii
 G had his clothes laundered by a passing fairy
@@ -55,6 +61,7 @@ G was rejuvenated by drinking from a magic stream
 G was bitten by a radioactive spider
 G hit it off with a drunk sorority chick named Jenny
 G was accepted into Pi Beta Phi
+G exchanged his old HDD for an SSD drive! FULL SPEED AHEAD!
 Q2 225 315 280 360 lay waste to the Towers of Ankh-Allor, wherein lies the terrible sorceror Croocq
 Q1 locate the centuries-lost tomes of the grim prophet Haplashak Mhadhu
 Q2 400 375 480 380 explore and chart the dark lands of T'rnalvph
@@ -72,4 +79,5 @@ Q2 235 125 430 60 setup a trade route through the mountains to the neighboring l
 Q2 155 155 325 270 live among and learn the ancient magick of the tribe of pygmie people, the Jow Botzi
 Q2 70 125 170 100 kill the resurrected Jow Botzian zombies produced by a young wizard's wayward spell
 Q2 370 325 270 130 steal the Minecraftia! website sources from neofreak
+Q2 155 40 3250 130 install Gentoo on fALSO's computer
 Q1 worship the sacred Cow until such time as she is satiated
