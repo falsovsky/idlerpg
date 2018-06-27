@@ -33,6 +33,18 @@ use IO::Select;
 use Data::Dumper;
 use Getopt::Long;
 
+# To use this script in OpenBSD you need to install the Crypt::UnixCrypt
+# perl module because OpenBSD crypt() isn't compatible with the Linux crypt().
+#
+# You can install it via cpan, and just uncomment the last commented line.
+#
+# Or create a "Crypt" directory on the bot directory, and put UnixCrypt.pm
+# there. Then change the "use lib" path to bot directory. And uncomment
+# the next three lines. Enjoy!
+#use lib '/path/to/bot';
+#BEGIN { $Crypt::UnixCrypt::OVERRIDE_BUILTIN = 1 }
+#use Crypt::UnixCrypt;
+
 my %opts;
 
 readconfig();
