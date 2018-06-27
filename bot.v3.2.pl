@@ -17,13 +17,7 @@
 # to everyone that's contributed!
 #
 # NOTE: This code should NOT be run as root. You deserve anything that happens
-#       to you if you run this code as a superuser. Also, note that giving a
-#       user admin access to the bot effectively gives them full access to the
-#       user under which your bot runs, as they can use the PEVAL command to
-#       execute any command, or possibly even change your password. I sincerely
-#       suggest that you exercise extreme caution when giving someone admin
-#       access to your bot, or that you disable the PEVAL command for non-owner
-#       accounts in your config file, .irpg.conf
+# to you if you run this code as a superuser.
 
 use strict;
 use warnings;
@@ -82,7 +76,6 @@ GetOptions(\%opts,
     "owner=s",
     "owneraddonly",
     "ownerdelonly",
-    "ownerpevalonly",
     "checkupdates",
     "senduserlist",
     "limitpen=i",
@@ -459,24 +452,6 @@ sub parse {
             if ($arg[3] eq "\1version\1") {
                 notice("\1VERSION IRPG bot v$version by jotun; ".
                        "http://idlerpg.net/\1",$usernick);
-            }
-            elsif ($arg[3] eq "peval") {
-                if (!ha($username) || ($opts{ownerpevalonly} &&
-                    $opts{owner} ne $username)) {
-                    privmsg("You don't have access to PEVAL.", $usernick);
-                }
-                else {
-                    my @peval = eval "@arg[4..$#arg]";
-                    if (@peval >= 4 || length("@peval") > 1024) {
-                        privmsg("Command produced too much output to send ".
-                                "outright; queueing ".length("@peval").
-                                " bytes in ".scalar(@peval)." items. Use ".
-                                "CLEARQ to clear queue if needed.",$usernick,1);
-                        privmsg($_,$usernick) for @peval;
-                    }
-                    else { privmsg($_,$usernick, 1) for @peval; }
-                    privmsg("EVAL ERROR: $@", $usernick, 1) if $@;
-                }
             }
             elsif ($arg[3] eq "register") {
                 if (defined $username) {
@@ -1381,8 +1356,7 @@ sub rpcheck { # check levels, update database
                     challenge_opp($k);
                 }
             }
-            # attempt to make sure this is an actual user, and not just an
-            # artifact of a bad PEVAL
+            # attempt to make sure this is an actual user
         }
         if (!$pausemode && ($rpreport%60 < $oldrpreport%60)) { writedb(); }
         $oldrpreport = $rpreport;
