@@ -1335,6 +1335,19 @@ sub rpcheck { # check levels, update database
                     "$rps{$u[$i]}{class}, is #" . ($i + 1) . "! Next level in ".
                     (duration($rps{$u[$i]}{next})).".");
         }
+
+        # Set the topic with the helpurl and top players. Repeats the code
+        # because everything in this bot is inside a if :-P
+        my @z = sort { $rps{$b}{level} <=> $rps{$a}{level} ||
+            $rps{$a}{next}  <=> $rps{$b}{next} } keys(%rps);
+
+        my $top = "";
+        for my $i (0..2) {
+            $#z >= $i and
+            $top .= "#".($i+1).": $z[$i], lv. $rps{$z[$i]}{level} $rps{$z[$i]}{class}; ";
+        }
+        sts("TOPIC $opts{botchan} :$opts{helpurl} $top", 1);
+
         backup();
     }
     if (($rpreport%3600 < $oldrpreport%3600) && $rpreport) { # 1 hour
