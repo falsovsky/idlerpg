@@ -1,1 +1,10 @@
 .irpg.conf
+.irpg.pid
+.dbbackup/
+Crypt/
+debug.txt
+irpg.db
+mapitems.db
+modifiers.txt
+questinfo.txt
+
