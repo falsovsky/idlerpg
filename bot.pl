@@ -98,6 +98,7 @@ GetOptions(\%opts,
     "rpstep=f",
     "rpbase=i",
     "rppenstep=f",
+    "itemdbfile=s",
     "dbfile|irpgdb|db|d=s",
 ) or debug("Error: Could not parse command line. Try $0 --help\n",1);
 
