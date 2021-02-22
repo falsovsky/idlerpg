@@ -14,7 +14,7 @@
 #		`systemctl --user daemon-reload'
 #
 # Start the bot with:
-# 		`systemctl --user start idelrpg_user.service'
+# 		`systemctl --user start idlerpg_user.service'
 #
 # Enjoy!
 ##########
