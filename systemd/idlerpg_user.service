@@ -1,0 +1,12 @@
+[Unit]
+Description=IdleRPG Bot
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=%h/idlerpg
+ExecStart=/usr/bin/perl bot.pl
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
