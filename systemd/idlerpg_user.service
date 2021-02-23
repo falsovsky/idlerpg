@@ -1,0 +1,33 @@
+##########
+#Instructions
+##########
+#
+# In order to use this script, you need to enable lingering for your user as root with:
+#		`loginctl enable-linger $USER'
+#
+# After that, login as $USER and enable the `.config' dir in your user by typing:
+#		`systemctl --user enable systemd-tmpfiles-clean.timer'
+#
+# Place this script inside `.config/systemd/user/' and name it `idlerpg_user.service'
+#
+# Reload the user systemd daemon with:
+#		`systemctl --user daemon-reload'
+#
+# Start the bot with:
+# 		`systemctl --user start idlerpg_user.service'
+#
+# Enjoy!
+##########
+
+[Unit]
+Description=IdleRPG Bot
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=%h/idlerpg
+ExecStart=/usr/bin/perl bot.pl
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
