@@ -16,6 +16,9 @@
 # Start the bot with:
 # 		`systemctl --user start idlerpg_user.service'
 #
+# Enable this script to start the bot on boot with:
+#		`systemctl --user enable idlerpg_user.service'
+#
 # Enjoy!
 ##########
 
