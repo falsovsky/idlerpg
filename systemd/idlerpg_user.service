@@ -4,6 +4,9 @@
 #
 # In order to use this script, you need to enable lingering for your user as root with:
 #		`loginctl enable-linger $USER'
+# 
+# Or as the user with:
+#   `loginctl enable-linger`
 #
 # After that, login as $USER and enable the `.config' dir in your user by typing:
 #		`systemctl --user enable systemd-tmpfiles-clean.timer'
@@ -15,6 +18,9 @@
 #
 # Start the bot with:
 # 		`systemctl --user start idlerpg_user.service'
+#
+# Enable this script to start the bot on boot with:
+#		`systemctl --user enable idlerpg_user.service'
 #
 # Enjoy!
 ##########
